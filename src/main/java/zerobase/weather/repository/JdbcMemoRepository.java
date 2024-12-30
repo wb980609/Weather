@@ -12,33 +12,37 @@ import java.util.Optional;
 
 @Repository
 public class JdbcMemoRepository {
+    //jdbc를 통해서 직접 JPA 기능을 구현해보는듯
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public JdbcMemoRepository(DataSource dataSource){
+    public JdbcMemoRepository(DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public Memo save(Memo memo){
-        String sql = "insert into memo values(?,?)";
+    public Memo save(Memo memo) {
+        String sql = "insert into memo values(?, ?)";
+
         jdbcTemplate.update(sql, memo.getId(), memo.getText());
+
         return memo;
     }
 
-    public List<Memo> findAll(){
+    public List<Memo> findAll() {
         String sql = "select * from memo";
         return jdbcTemplate.query(sql, memoRowMapper());
     }
 
-    public Optional<Memo> findById(int id){
+    public Optional<Memo> findById(int id) {
         String sql = "select * from memo where id = ?";
         return jdbcTemplate.query(sql, memoRowMapper(), id).stream().findFirst();
     }
 
-    private RowMapper<Memo> memoRowMapper(){
-        //ResultSet
-        // {id = 1, text = 'this is memo'}
+    private RowMapper<Memo> memoRowMapper() {
+        // ResultSet
+        // {id = 1, text = 'this is memo~'}
+
         return (rs, rowNum) -> new Memo(
                 rs.getInt("id"),
                 rs.getString("text")
